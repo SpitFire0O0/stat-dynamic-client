@@ -1,0 +1,15 @@
+.Container {
+    height: 60px;
+    background: white;
+    border-top: 1px solid var(--second-light-color);
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    padding: 0 10px 0 10px;
+    color: var(--primary-color);
+    position: relative;
+}
+
+.Container > * {
+    display: flex;
+    align-items: center;
+}

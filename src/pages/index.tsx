@@ -1,0 +1,11 @@
+export { HomePage } from "./home";
+export { ProfilePage } from "./profile";
+export { ProfileSettingsPage } from "./profile-settings";
+export { ProfileHomeworkPage } from "./homework";
+export { SettingsPage } from "./settings";
+export { DocsPage } from "./docs";
+export { SchedulePage } from "./schedule";
+export { ErrorPage } from "./error";
+export { AuthPage } from "./auth";
+export { MessagesPage } from "./messages";
+export { AdminPage } from "./admin";

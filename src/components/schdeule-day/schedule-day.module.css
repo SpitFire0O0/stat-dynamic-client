@@ -1,0 +1,75 @@
+.Container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.Date {
+    background: white;
+    width: 40px;
+    height: 100%;
+    display: flex;
+    writing-mode: vertical-rl;
+    transform-origin: center;
+    transform: rotate(-180deg);
+    min-height: 390px;
+    justify-content: space-between;
+    border-radius: 4px;
+}
+
+.DayName, .DayDate {
+    padding: 10px;
+}
+
+.DayName {
+    font-size: 18px;
+    letter-spacing: 4px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--primary-color);
+}
+.DayDate {
+    font-size: 12px;
+}
+
+.Content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+.Content > .Labels:nth-child(odd) > div {
+    background: #fff;
+}
+
+.Content > .Labels:nth-child(even) > div {
+    background: #eee;
+}
+
+.Labels {
+    display: grid;
+    grid-template-columns: 100px 160px 200px 80px 120px 1fr;
+    gap: 20px;
+}
+
+.Date, .Labels > div {
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    height: 40px;
+}
+
+.Labels:hover > .Time > div {
+    background: #436262;
+}
+
+.Time {}
+.Title {}
+.Person {}
+.Room {}
+.Type {}
+.Description {}
+

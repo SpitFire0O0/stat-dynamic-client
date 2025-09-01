@@ -1,0 +1,8 @@
+.Container {
+    background: var(--primary-color);
+    padding: 0 10px 0 10px;
+    border-top: 1px solid var(--second-light-color);
+    font-size: 12px;
+    color: var(--light-color);
+    transition: .3s;
+}
