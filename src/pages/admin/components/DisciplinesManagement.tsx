@@ -31,6 +31,7 @@ import {
   BookOpen,
   Calendar
 } from "lucide-react";
+import { useDisciplines } from "../../../_api/hooks/useDisciplines";
 
 export interface AdminDiscipline {
   id: string;
@@ -48,70 +49,16 @@ interface DisciplinesManagementProps {
 }
 
 export const DisciplinesManagement: React.FC<DisciplinesManagementProps> = ({ onBack }) => {
-  const [disciplines, setDisciplines] = useState<AdminDiscipline[]>([]);
+  const { list } = useDisciplines();
+  const disciplines = (list.data as unknown as AdminDiscipline[]) || [];
   const [filteredDisciplines, setFilteredDisciplines] = useState<AdminDiscipline[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [creditsFilter, setCreditsFilter] = useState<string>("all");
   const [selectedDiscipline, setSelectedDiscipline] = useState<AdminDiscipline | null>(null);
 
-  // Моковые данные
   useEffect(() => {
-    const mockDisciplines: AdminDiscipline[] = [
-      {
-        id: "1",
-        title: "Математика",
-        description: "Основы математического анализа и алгебры",
-        code: "MATH101",
-        credits: 6,
-        hours: 120,
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z"
-      },
-      {
-        id: "2",
-        title: "Физика",
-        description: "Классическая механика и термодинамика",
-        code: "PHYS101",
-        credits: 5,
-        hours: 90,
-        createdAt: "2024-01-02T00:00:00Z",
-        updatedAt: "2024-01-02T00:00:00Z"
-      },
-      {
-        id: "3",
-        title: "Химия",
-        description: "Общая и неорганическая химия",
-        code: "CHEM101",
-        credits: 4,
-        hours: 80,
-        createdAt: "2024-01-03T00:00:00Z",
-        updatedAt: "2024-01-03T00:00:00Z"
-      },
-      {
-        id: "4",
-        title: "История",
-        description: "История России и всеобщая история",
-        code: "HIST101",
-        credits: 3,
-        hours: 60,
-        createdAt: "2024-01-04T00:00:00Z",
-        updatedAt: "2024-01-04T00:00:00Z"
-      },
-      {
-        id: "5",
-        title: "Литература",
-        description: "Русская и зарубежная литература",
-        code: "LIT101",
-        credits: 4,
-        hours: 75,
-        createdAt: "2024-01-05T00:00:00Z",
-        updatedAt: "2024-01-05T00:00:00Z"
-      }
-    ];
-
-    setDisciplines(mockDisciplines);
-    setFilteredDisciplines(mockDisciplines);
-  }, []);
+    setFilteredDisciplines(disciplines);
+  }, [disciplines]);
 
   useEffect(() => {
     let filtered = disciplines;

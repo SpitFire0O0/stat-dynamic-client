@@ -14,6 +14,7 @@ export interface Lesson {
   homework?: string;
   grade?: string;
   group: string;
+  meetingId?: string;
 }
 
 interface LessonsGridProps {

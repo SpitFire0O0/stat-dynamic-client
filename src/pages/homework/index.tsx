@@ -23,7 +23,7 @@ import {
 	AlertIcon
 } from "@chakra-ui/react";
 import {
-	Search,
+    Search,
 	Filter,
 	BookOpen,
 	Calendar,
@@ -34,19 +34,20 @@ import {
 	FileText,
 	User
 } from "lucide-react";
+import { useHomework } from "../../_api/hooks/useHomework";
 
-interface Homework {
-	id: string;
-	title: string;
-	content: string;
-	subject: string;
-	teacher: string;
-	dateAssigned: string;
-	dueDate: string;
-	status: 'pending' | 'completed' | 'overdue' | 'submitted';
-	priority: 'low' | 'medium' | 'high';
-	grade?: string;
-	feedback?: string;
+interface HomeworkItem {
+    id: string;
+    title: string;
+    content: string;
+    subject: string;
+    teacher: string;
+    dateAssigned: string;
+    dueDate: string;
+    status: 'pending' | 'completed' | 'overdue' | 'submitted';
+    priority: 'low' | 'medium' | 'high';
+    grade?: string;
+    feedback?: string;
 }
 
 export const ProfileHomeworkPage: React.FC = () => {
@@ -58,7 +59,9 @@ export const ProfileHomeworkPage: React.FC = () => {
 	const [sortBy, setSortBy] = useState<string>("dueDate");
 
 	// Моковые данные для демонстрации
-	const [homeworks] = useState<Homework[]>([
+    const { list } = useHomework();
+    // Fallback мок-данные
+    const [homeworksMock] = useState<HomeworkItem[]>([
 		{
 			id: "1",
 			title: "Решение квадратных уравнений",
@@ -118,12 +121,32 @@ export const ProfileHomeworkPage: React.FC = () => {
 		}
 	]);
 
-	const filteredAndSortedHomeworks = useMemo(() => {
-		let filtered = homeworks.filter(homework => {
-			const matchesSearch = homework.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				homework.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				homework.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				homework.teacher.toLowerCase().includes(searchTerm.toLowerCase());
+    // Данные из API маппим в UI-формат, с дефолтами
+    const apiHomeworks: HomeworkItem[] = useMemo(() => {
+        const arr = (list.data as any[]) || [];
+        return arr.map((h) => ({
+            id: h.id || String(Math.random()),
+            title: h.title || 'Задание',
+            content: h.content || '',
+            subject: h.subject || 'Предмет',
+            teacher: h.teacher || 'Преподаватель',
+            dateAssigned: h.dateBegin || h.createdAt || new Date().toISOString(),
+            dueDate: h.dateEnd || new Date().toISOString(),
+            status: 'pending',
+            priority: 'medium',
+            grade: h.grade,
+            feedback: h.feedback,
+        }));
+    }, [list.data]);
+
+    const homeworks = apiHomeworks.length ? apiHomeworks : homeworksMock;
+
+    const filteredAndSortedHomeworks = useMemo(() => {
+        let filtered = homeworks.filter(homework => {
+            const matchesSearch = homework.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                homework.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                homework.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                homework.teacher.toLowerCase().includes(searchTerm.toLowerCase());
 			
 			const matchesStatus = statusFilter === "all" || homework.status === statusFilter;
 			const matchesSubject = subjectFilter === "all" || homework.subject === subjectFilter;
@@ -190,9 +213,7 @@ export const ProfileHomeworkPage: React.FC = () => {
 		}
 	};
 
-	const getSubjects = () => {
-		return Array.from(new Set(homeworks.map(h => h.subject)));
-	};
+    const getSubjects = () => Array.from(new Set(homeworks.map(h => h.subject)));
 
 	const clearFilters = () => {
 		setSearchTerm("");

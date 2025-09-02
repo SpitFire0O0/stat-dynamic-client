@@ -37,6 +37,8 @@ import {
 import { UserFormModal } from "./UserFormModal";
 import { UserDetailsModal } from "./UserDetailsModal";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { useUsers } from "../../../_api/hooks/useUsers";
+import { useToast } from "@chakra-ui/react";
 
 export interface AdminUser {
   id: string;
@@ -58,7 +60,8 @@ interface UsersManagementProps {
 }
 
 export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const toast = useToast();
+  const { list, create, update, remove } = useUsers();
   const [filteredUsers, setFilteredUsers] = useState<AdminUser[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [permissionFilter, setPermissionFilter] = useState<string>("all");
@@ -83,49 +86,11 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
     onClose: onDeleteClose
   } = useDisclosure();
 
-  // Моковые данные для демонстрации
+  // Поддержка данных из API
+  const users = (list.data as unknown as AdminUser[]) || [];
   useEffect(() => {
-    const mockUsers: AdminUser[] = [
-      {
-        id: "1",
-        login: "admin@example.com",
-        firstName: "Администратор",
-        lastName: "Системы",
-        phone: "+7 (999) 123-45-67",
-        address: "г. Москва",
-        gender: "MALE",
-        permissions: "ADMIN",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z"
-      },
-      {
-        id: "2",
-        login: "teacher@example.com",
-        firstName: "Иван",
-        lastName: "Петров",
-        phone: "+7 (999) 234-56-78",
-        address: "г. Москва",
-        gender: "MALE",
-        permissions: "TEACHER",
-        createdAt: "2024-01-02T00:00:00Z",
-        updatedAt: "2024-01-02T00:00:00Z"
-      },
-      {
-        id: "3",
-        login: "student@example.com",
-        firstName: "Мария",
-        lastName: "Сидорова",
-        phone: "+7 (999) 345-67-89",
-        address: "г. Москва",
-        gender: "FEMALE",
-        permissions: "STUDENT",
-        createdAt: "2024-01-03T00:00:00Z",
-        updatedAt: "2024-01-03T00:00:00Z"
-      }
-    ];
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
-  }, []);
+    setFilteredUsers(users);
+  }, [users]);
 
   useEffect(() => {
     let filtered = users;
@@ -167,35 +132,43 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
     onDeleteOpen();
   };
 
-  const handleSaveUser = (userData: Partial<AdminUser>) => {
-    if (selectedUser) {
-      // Обновление существующего пользователя
-      setUsers(prev => prev.map(user => 
-        user.id === selectedUser.id ? { ...user, ...userData } : user
-      ));
-    } else {
-      // Создание нового пользователя
-      const newUser: AdminUser = {
-        id: Date.now().toString(),
-        login: userData.login!,
-        firstName: userData.firstName!,
-        lastName: userData.lastName!,
-        phone: userData.phone,
-        address: userData.address,
-        gender: userData.gender!,
-        permissions: userData.permissions!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setUsers(prev => [...prev, newUser]);
+  const handleSaveUser = async (userData: Partial<AdminUser>) => {
+    setIsLoading(true);
+    try {
+      if (selectedUser) {
+        await update.mutateAsync({ id: selectedUser.id, dto: userData as any });
+      } else {
+        // Backend requires password & birthday; provide safe defaults if missing
+        const payload: any = {
+          login: userData.login,
+          password: "Password123!",
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          birthday: new Date(2010, 0, 1).toISOString(),
+          phone: userData.phone || "",
+          address: userData.address || "",
+          gender: userData.gender,
+          permissions: userData.permissions,
+        };
+        await create.mutateAsync(payload);
+      }
+      onFormClose();
+      toast({ title: 'Сохранено', status: 'success', duration: 2000 });
+    } catch (e: any) {
+      toast({ title: 'Ошибка сохранения', description: e?.message || 'Ошибка', status: 'error' });
+    } finally {
+      setIsLoading(false);
     }
-    onFormClose();
   };
 
-  const handleConfirmDelete = () => {
-    if (selectedUser) {
-      setUsers(prev => prev.filter(user => user.id !== selectedUser.id));
+  const handleConfirmDelete = async () => {
+    if (!selectedUser) return;
+    try {
+      await remove.mutateAsync(selectedUser.id);
       onDeleteClose();
+      toast({ title: 'Удалено', status: 'info', duration: 2000 });
+    } catch (e: any) {
+      toast({ title: 'Ошибка удаления', description: e?.message || 'Ошибка', status: 'error' });
     }
   };
 

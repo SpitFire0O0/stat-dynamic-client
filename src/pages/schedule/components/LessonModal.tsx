@@ -12,10 +12,15 @@ import {
   Badge, 
   Divider,
   Alert,
-  AlertIcon
+  AlertIcon,
+  Button,
+  HStack as CHStack,
+  useToast
 } from "@chakra-ui/react";
 import { BookOpen, Users, User, MapPin, Calendar, Info } from "lucide-react";
 import { Lesson } from "./LessonsGrid";
+import { useAuth } from "../../../hooks/useAuth";
+import { useMeetings } from "../../../_api/hooks/useMeetings";
 
 interface LessonModalProps {
   isOpen: boolean;
@@ -28,6 +33,9 @@ export const LessonModal: React.FC<LessonModalProps> = ({
   onClose,
   selectedLesson,
 }) => {
+  const toast = useToast();
+  const { user } = useAuth();
+  const { remove } = useMeetings();
   const getTypeColor = (type: string) => {
     switch (type) {
       case "Урок": return "blue";
@@ -120,6 +128,30 @@ export const LessonModal: React.FC<LessonModalProps> = ({
                       {selectedLesson.grade}
                     </Badge>
                   </HStack>
+                </>
+              )}
+
+              {(user?.permissions === 'ADMIN' || user?.permissions === 'TEACHER') && selectedLesson.meetingId && (
+                <>
+                  <Divider />
+                  <CHStack justify="flex-end" pt={2}>
+                    {/* В дальнейшем можно добавить кнопку Редактировать */}
+                    <Button
+                      colorScheme="red"
+                      variant="outline"
+                      onClick={async () => {
+                        try {
+                          await remove.mutateAsync(selectedLesson.meetingId as any);
+                          toast({ title: 'Занятие удалено', status: 'info' });
+                          onClose();
+                        } catch (e: any) {
+                          toast({ title: 'Ошибка удаления', description: e?.message || 'Ошибка', status: 'error' });
+                        }
+                      }}
+                    >
+                      Удалить занятие
+                    </Button>
+                  </CHStack>
                 </>
               )}
             </VStack>

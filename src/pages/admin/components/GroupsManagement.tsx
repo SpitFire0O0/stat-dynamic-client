@@ -34,6 +34,8 @@ import {
   Calendar,
   UserPlus
 } from "lucide-react";
+import { useGroups } from "../../../_api/hooks/useGroups";
+import { useCourses } from "../../../_api/hooks/useCourses";
 
 export interface AdminGroup {
   id: string;
@@ -63,68 +65,19 @@ interface GroupsManagementProps {
 }
 
 export const GroupsManagement: React.FC<GroupsManagementProps> = ({ onBack }) => {
-  const [groups, setGroups] = useState<AdminGroup[]>([]);
-  const [courses, setCourses] = useState<any[]>([]);
+  const { list: groupsQuery } = useGroups();
+  const { list: coursesQuery } = useCourses();
+  const groups = (groupsQuery.data as unknown as AdminGroup[]) || [];
+  const courses = (coursesQuery.data as unknown as any[]) || [];
   const [filteredGroups, setFilteredGroups] = useState<AdminGroup[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [selectedGroup, setSelectedGroup] = useState<AdminGroup | null>(null);
 
-  // Моковые данные
   useEffect(() => {
-    const mockCourses = [
-      { id: "1", title: "Алгебра и начала анализа" },
-      { id: "2", title: "Механика" },
-      { id: "3", title: "Органическая химия" }
-    ];
-
-    const mockStudents: AdminUser[] = [
-      { id: "1", firstName: "Иван", lastName: "Иванов", login: "ivanov", permissions: "STUDENT" },
-      { id: "2", firstName: "Петр", lastName: "Петров", login: "petrov", permissions: "STUDENT" },
-      { id: "3", firstName: "Анна", lastName: "Сидорова", login: "sidorova", permissions: "STUDENT" }
-    ];
-
-    const mockGroups: AdminGroup[] = [
-      {
-        id: "1",
-        name: "10А",
-        description: "Группа 10А класса",
-        academicYear: 2024,
-        courseId: "1",
-        course: mockCourses[0],
-        students: [mockStudents[0], mockStudents[1]],
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z"
-      },
-      {
-        id: "2",
-        name: "10Б",
-        description: "Группа 10Б класса",
-        academicYear: 2024,
-        courseId: "2",
-        course: mockCourses[1],
-        students: [mockStudents[2]],
-        createdAt: "2024-01-02T00:00:00Z",
-        updatedAt: "2024-01-02T00:00:00Z"
-      },
-      {
-        id: "3",
-        name: "11А",
-        description: "Группа 11А класса",
-        academicYear: 2024,
-        courseId: "3",
-        course: mockCourses[2],
-        students: mockStudents,
-        createdAt: "2024-01-03T00:00:00Z",
-        updatedAt: "2024-01-03T00:00:00Z"
-      }
-    ];
-
-    setCourses(mockCourses);
-    setGroups(mockGroups);
-    setFilteredGroups(mockGroups);
-  }, []);
+    setFilteredGroups(groups);
+  }, [groups]);
 
   useEffect(() => {
     let filtered = groups;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Heading, Text } from "@chakra-ui/react";
 import { TrendingUp, Star, CheckCircle } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
@@ -9,6 +9,9 @@ import { RecentGrades } from "./components/RecentGrades";
 import { HomeworkList } from "./components/HomeworkList";
 import { NotificationsList } from "./components/NotificationsList";
 import { QuickActions } from "./components/QuickActions";
+import { useMeetings } from "../../_api/hooks/useMeetings";
+import { useGrades } from "../../_api/hooks/useGrades";
+import { useHomework } from "../../_api/hooks/useHomework";
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -34,74 +37,68 @@ export const HomePage: React.FC = () => {
     }
   ];
 
-  const upcomingLessons = [
-    {
-      id: 1,
-      subject: "Алгебра",
-      teacher: "Иванов А.Д.",
-      time: "08:30 - 09:15",
-      room: "204",
-      type: "Урок"
-    },
-    {
-      id: 2,
-      subject: "Физика",
-      teacher: "Петров В.С.",
-      time: "09:25 - 10:10",
-      room: "301",
-      type: "Лабораторная"
-    },
-    {
-      id: 3,
-      subject: "История",
-      teacher: "Сидорова Е.М.",
-      time: "10:20 - 11:05",
-      room: "105",
-      type: "Урок"
-    }
-  ];
+  const { list: meetingsQuery } = useMeetings();
+  const upcomingLessons = useMemo(() => {
+    const meetings = (meetingsQuery.data as any[]) || [];
+    const today = new Date();
+    const sameDay = (d: Date) => d.toDateString() === today.toDateString();
+    const toItem = (m: any, idx: number) => {
+      const start = new Date(m.dateBegin);
+      const durMs = Number(m.duration) || 45 * 60 * 1000;
+      const end = new Date(start.getTime() + durMs);
+      return {
+        id: idx + 1,
+        subject: m.title || 'Занятие',
+        teacher: m.curatorName || 'Преподаватель',
+        time: `${start.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`,
+        room: m.room || '—',
+        type: m.type || 'Урок',
+      };
+    };
+    const todays = meetings.filter((m) => {
+      const d = new Date(m.dateBegin);
+      return sameDay(d);
+    });
+    const items = todays.slice(0, 3).map(toItem);
+    if (items.length) return items as any;
+    // fallback demo
+    return [
+      { id: 1, subject: 'Алгебра', teacher: 'Иванов А.Д.', time: '08:30 - 09:15', room: '204', type: 'Урок' },
+      { id: 2, subject: 'Физика', teacher: 'Петров В.С.', time: '09:25 - 10:10', room: '301', type: 'Лабораторная' },
+      { id: 3, subject: 'История', teacher: 'Сидорова Е.М.', time: '10:20 - 11:05', room: '105', type: 'Урок' },
+    ];
+  }, [meetingsQuery.data]);
 
-  const recentGrades = [
-    {
-      subject: "Алгебра",
-      grade: "5",
-      type: "Контрольная работа",
-      date: "Сегодня"
-    },
-    {
-      subject: "Физика",
-      grade: "4",
-      type: "Лабораторная работа",
-      date: "Вчера"
-    },
-    {
-      subject: "История",
-      grade: "5",
-      type: "Доклад",
-      date: "2 дня назад"
-    }
-  ];
+  const { list: gradesQuery } = useGrades();
+  const recentGrades = useMemo(() => {
+    const grades = (gradesQuery.data as any[]) || [];
+    const items = grades.slice(0, 3).map((g) => ({
+      subject: g.subject || 'Предмет',
+      grade: g.grade || '-',
+      type: g.type || 'Оценка',
+      date: new Date(g.createdAt || Date.now()).toLocaleDateString('ru-RU'),
+    }));
+    return items.length ? items : [
+      { subject: 'Алгебра', grade: '5', type: 'Контрольная работа', date: 'Сегодня' },
+      { subject: 'Физика', grade: '4', type: 'Лабораторная работа', date: 'Вчера' },
+      { subject: 'История', grade: '5', type: 'Доклад', date: '2 дня назад' },
+    ];
+  }, [gradesQuery.data]);
 
-  const homeworkItems = [
-    {
-      subject: "Алгебра",
-      task: "Решить задачи №15-20 стр. 45",
-      due: "Завтра",
-      status: "pending" as const
-    },
-    {
-      subject: "Физика",
-      task: "Подготовить отчет по лабораторной работе",
-      due: "Послезавтра",
-      status: "completed" as const
-    },
-    {
-      subject: "Химия",
-      task: "Изучить главу 5 учебника",
-      due: "Через 3 дня",
-      status: "pending" as const
-    }
-  ];
+  const { list: homeworkQuery } = useHomework();
+  const homeworkItems = useMemo(() => {
+    const items = ((homeworkQuery.data as any[]) || []).slice(0, 3).map((h) => ({
+      subject: h.subject || 'Предмет',
+      task: h.content || h.title || 'Задание',
+      due: new Date(h.dateEnd || Date.now()).toLocaleDateString('ru-RU'),
+      status: 'pending' as const,
+    }));
+    return items.length ? items : [
+      { subject: 'Алгебра', task: 'Решить задачи №15-20 стр. 45', due: 'Завтра', status: 'pending' as const },
+      { subject: 'Физика', task: 'Подготовить отчет по лабораторной работе', due: 'Послезавтра', status: 'completed' as const },
+      { subject: 'Химия', task: 'Изучить главу 5 учебника', due: 'Через 3 дня', status: 'pending' as const },
+    ];
+  }, [homeworkQuery.data]);
 
   const notifications = [
     {

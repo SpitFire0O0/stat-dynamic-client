@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useDisclosure } from "@chakra-ui/react";
+import { useDisclosure, Button, HStack } from "@chakra-ui/react";
 import { ScheduleHeader } from "./components/ScheduleHeader";
 import { ScheduleFilters } from "./components/ScheduleFilters";
 import { WeekNavigation } from "./components/WeekNavigation";
 import { LessonsGrid, type Lesson } from "./components/LessonsGrid";
 import { DayStats } from "./components/DayStats";
 import { LessonModal } from "./components/LessonModal";
+import { useMeetings } from "../../_api/hooks/useMeetings";
+import { useGroups } from "../../_api/hooks/useGroups";
+import { useUsers } from "../../_api/hooks/useUsers";
+import { MeetingFormModal } from "./components/MeetingFormModal";
+import { useAuth } from "../../hooks/useAuth";
 
 export const SchedulePage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -16,6 +21,8 @@ export const SchedulePage: React.FC = () => {
   const [selectedGroup, setSelectedGroup] = useState<string>("10А");
   const [selectedTeacher, setSelectedTeacher] = useState<string>("Иванов А.Д.");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const createModal = useDisclosure();
+  const { user } = useAuth();
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
 
   // Читаем тип из URL при загрузке компонента
@@ -26,14 +33,25 @@ export const SchedulePage: React.FC = () => {
     }
   }, [searchParams]);
 
-  // Все группы/классы
-  const groups = ["10А", "10Б", "10В", "11А", "11Б", "11В", "9А", "9Б", "9В"];
+  // Группы и преподаватели из API (с фолбэком на статичные списки)
+  const { list: groupsQuery } = useGroups();
+  const { list: usersQuery } = useUsers();
+  const groups = useMemo(() => {
+    const arr = (groupsQuery.data as any[]) || [];
+    const names = arr.map((g) => g.name).filter(Boolean);
+    return names.length ? names : ["10А", "10Б", "10В", "11А", "11Б", "11В", "9А", "9Б", "9В"];
+  }, [groupsQuery.data]);
+  const teachers = useMemo(() => {
+    const arr = (usersQuery.data as any[]) || [];
+    const names = arr.filter((u) => u.permissions === 'TEACHER').map((u) => `${u.firstName} ${u.lastName}`.trim());
+    return names.length ? names : ["Иванов А.Д.", "Петров В.С.", "Козлов И.П.", "Сидорова Е.М.", "Смирнова О.Л.", "Волкова Н.К."];
+  }, [usersQuery.data]);
   
-  // Все преподаватели
-  const teachers = ["Иванов А.Д.", "Петров В.С.", "Козлов И.П.", "Сидорова Е.М.", "Смирнова О.Л.", "Волкова Н.К."];
+  // Интеграция с API встреч/уроков
+  const { list: meetingsQuery } = useMeetings();
 
-  // Расписание для всех групп
-  const allLessons: Lesson[] = [
+  // Fallback мок-данные, если API пустой
+  const mockLessons: Lesson[] = [
     // 10А
     {
       id: 1,
@@ -148,6 +166,57 @@ export const SchedulePage: React.FC = () => {
     onOpen();
   };
 
+  // Helpers: start and end of week (Mon-Sun)
+  const startOfWeek = (d: Date) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = (day === 0 ? -6 : 1) - day; // Monday as start
+    date.setDate(date.getDate() + diff);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  };
+  const endOfWeek = (d: Date) => {
+    const s = startOfWeek(d);
+    const e = new Date(s);
+    e.setDate(e.getDate() + 6);
+    e.setHours(23, 59, 59, 999);
+    return e;
+  };
+
+  // Преобразуем встречи API -> формат Lesson для грида
+  const apiLessons: Lesson[] = useMemo(() => {
+    const meetings = (meetingsQuery.data as any[]) || [];
+    const from = startOfWeek(currentWeek).getTime();
+    const to = endOfWeek(currentWeek).getTime();
+    return meetings.filter((m) => {
+      const t = new Date(m.dateBegin).getTime();
+      return t >= from && t <= to;
+    }).map((m, idx) => {
+      const start = new Date(m.dateBegin);
+      // duration в API как string; по умолчанию 45 минут
+      const durMs = Number(m.duration) || 45 * 60 * 1000;
+      const end = new Date(start.getTime() + durMs);
+      const time = `${start.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+      const weekdays = ["Воскресенье","Понедельник","Вторник","Среда","Четверг","Пятница","Суббота"];
+      const day = weekdays[start.getDay()] || "Понедельник";
+       return {
+         id: idx + 1000,
+         day,
+         time,
+         subject: m.title || "Занятие",
+         teacher: m.curatorName || "Преподаватель",
+         room: m.room || "—",
+         type: m.type || "Урок",
+         description: m.content,
+         homework: undefined,
+         group: m.groupName || selectedGroup,
+         meetingId: m.id,
+       } as Lesson;
+     });
+  }, [meetingsQuery.data, selectedGroup, currentWeek]);
+
+  const allLessons: Lesson[] = apiLessons.length ? apiLessons : mockLessons;
+
   const nextWeek = () => {
     const next = new Date(currentWeek);
     next.setDate(next.getDate() + 7);
@@ -162,7 +231,12 @@ export const SchedulePage: React.FC = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <ScheduleHeader scheduleType={scheduleType} />
+      <HStack justify="space-between" align="center">
+        <ScheduleHeader scheduleType={scheduleType} />
+        {(user?.permissions === 'ADMIN' || user?.permissions === 'TEACHER') && (
+          <Button colorScheme="blue" onClick={createModal.onOpen}>Добавить занятие</Button>
+        )}
+      </HStack>
 
       <ScheduleFilters
         scheduleType={scheduleType}
@@ -205,6 +279,12 @@ export const SchedulePage: React.FC = () => {
         isOpen={isOpen}
         onClose={onClose}
         selectedLesson={selectedLesson}
+      />
+
+      <MeetingFormModal
+        isOpen={createModal.isOpen}
+        onClose={createModal.onClose}
+        defaultDate={currentWeek}
       />
     </div>
   );
