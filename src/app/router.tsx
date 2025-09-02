@@ -11,9 +11,11 @@ import {
 	SettingsPage,
 	AuthPage,
 	MessagesPage,
-	AdminPage
+	AdminPage,
+	ClubsPage
 } from "../pages"
 import { SchedulePage } from "../pages/index.tsx";
+import { AdminCrudHome, AdminCrudEntityPage } from "../pages";
 
 export const router = createBrowserRouter([
 	{
@@ -61,6 +63,18 @@ export const router = createBrowserRouter([
 				path: '/admin',
 				element: <AdminPage />
 			},
+            {
+                path: '/admin/crud',
+                element: <AdminCrudHome />
+            },
+            {
+                path: '/admin/crud/:entity',
+                element: <AdminCrudEntityPage />
+            },
+            {
+                path: '/clubs',
+                element: <ClubsPage />
+            },
 		]
 	},
 	{

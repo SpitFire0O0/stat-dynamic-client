@@ -19,7 +19,7 @@ import {
   Box,
   Text
 } from "@chakra-ui/react";
-import { AdminUser } from "./UsersManagement";
+import type { AdminUser } from "./UsersManagement";
 
 interface UserFormModalProps {
   isOpen: boolean;

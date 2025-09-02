@@ -37,6 +37,9 @@ import {
 import { UserFormModal } from "./UserFormModal";
 import { UserDetailsModal } from "./UserDetailsModal";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { BaseTable } from "../../../components/base-table/BaseTable";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { requestList, requestCreate, requestUpdate, requestDelete } from "../../../_api/crud";
 
 export interface AdminUser {
   id: string;
@@ -58,12 +61,16 @@ interface UsersManagementProps {
 }
 
 export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const qc = useQueryClient();
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['admin', 'users', 'list'],
+    queryFn: async () => await requestList<AdminUser>('/api/users'),
+  });
   const [filteredUsers, setFilteredUsers] = useState<AdminUser[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [permissionFilter, setPermissionFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
 
   const {
     isOpen: isFormOpen,
@@ -83,52 +90,13 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
     onClose: onDeleteClose
   } = useDisclosure();
 
-  // Моковые данные для демонстрации
+  // Пересчитываем отфильтрованный список при изменении данных/фильтров
   useEffect(() => {
-    const mockUsers: AdminUser[] = [
-      {
-        id: "1",
-        login: "admin@example.com",
-        firstName: "Администратор",
-        lastName: "Системы",
-        phone: "+7 (999) 123-45-67",
-        address: "г. Москва",
-        gender: "MALE",
-        permissions: "ADMIN",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z"
-      },
-      {
-        id: "2",
-        login: "teacher@example.com",
-        firstName: "Иван",
-        lastName: "Петров",
-        phone: "+7 (999) 234-56-78",
-        address: "г. Москва",
-        gender: "MALE",
-        permissions: "TEACHER",
-        createdAt: "2024-01-02T00:00:00Z",
-        updatedAt: "2024-01-02T00:00:00Z"
-      },
-      {
-        id: "3",
-        login: "student@example.com",
-        firstName: "Мария",
-        lastName: "Сидорова",
-        phone: "+7 (999) 345-67-89",
-        address: "г. Москва",
-        gender: "FEMALE",
-        permissions: "STUDENT",
-        createdAt: "2024-01-03T00:00:00Z",
-        updatedAt: "2024-01-03T00:00:00Z"
-      }
-    ];
-    setUsers(mockUsers);
-    setFilteredUsers(mockUsers);
-  }, []);
+    setFilteredUsers(users);
+  }, [users]);
 
   useEffect(() => {
-    let filtered = users;
+    let filtered = users as AdminUser[];
 
     // Фильтр по поиску
     if (searchQuery) {
@@ -167,34 +135,33 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
     onDeleteOpen();
   };
 
+  const createMutation = useMutation({
+    mutationFn: (payload: Partial<AdminUser>) => requestCreate('/api/users', payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users', 'list'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<AdminUser> }) => requestUpdate('/api/users', id, payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users', 'list'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => requestDelete('/api/users', id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users', 'list'] }),
+  });
+
   const handleSaveUser = (userData: Partial<AdminUser>) => {
     if (selectedUser) {
-      // Обновление существующего пользователя
-      setUsers(prev => prev.map(user => 
-        user.id === selectedUser.id ? { ...user, ...userData } : user
-      ));
+      updateMutation.mutate({ id: selectedUser.id, payload: userData });
     } else {
-      // Создание нового пользователя
-      const newUser: AdminUser = {
-        id: Date.now().toString(),
-        login: userData.login!,
-        firstName: userData.firstName!,
-        lastName: userData.lastName!,
-        phone: userData.phone,
-        address: userData.address,
-        gender: userData.gender!,
-        permissions: userData.permissions!,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setUsers(prev => [...prev, newUser]);
+      createMutation.mutate(userData);
     }
     onFormClose();
   };
 
   const handleConfirmDelete = () => {
     if (selectedUser) {
-      setUsers(prev => prev.filter(user => user.id !== selectedUser.id));
+      deleteMutation.mutate(selectedUser.id);
       onDeleteClose();
     }
   };
@@ -303,84 +270,70 @@ export const UsersManagement: React.FC<UsersManagementProps> = ({ onBack }) => {
         </Card>
       </HStack>
 
-      {/* Таблица пользователей */}
+      {/* Таблица пользователей (через дженерик BaseTable) */}
       <Card>
         <CardBody>
-          <Box overflowX="auto">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Пользователь</Th>
-                  <Th>Email</Th>
-                  <Th>Телефон</Th>
-                  <Th>Права</Th>
-                  <Th>Дата создания</Th>
-                  <Th>Действия</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {filteredUsers.map((user) => (
-                  <Tr key={user.id}>
-                    <Td>
-                      <HStack spacing={3}>
-                        <Avatar size="sm" name={`${user.firstName} ${user.lastName}`} />
-                        <VStack align="start" spacing={0}>
-                          <Text fontWeight="semibold">
-                            {user.firstName} {user.lastName}
-                          </Text>
-                          <Text fontSize="sm" color="gray.600">
-                            {user.gender === "MALE" ? "Мужской" : "Женский"}
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </Td>
-                    <Td>{user.login}</Td>
-                    <Td>{user.phone || "-"}</Td>
-                    <Td>
-                      <Badge colorScheme={getPermissionColor(user.permissions)}>
-                        {getPermissionLabel(user.permissions)}
-                      </Badge>
-                    </Td>
-                    <Td>
-                      {new Date(user.createdAt).toLocaleDateString('ru-RU')}
-                    </Td>
-                    <Td>
-                      <HStack spacing={2}>
-                        <Tooltip label="Просмотр">
-                          <IconButton
-                            size="sm"
-                            variant="ghost"
-                            icon={<Eye size={16} />}
-                            onClick={() => handleViewUser(user)}
-                            aria-label="Просмотр"
-                          />
-                        </Tooltip>
-                        <Tooltip label="Редактировать">
-                          <IconButton
-                            size="sm"
-                            variant="ghost"
-                            icon={<Edit size={16} />}
-                            onClick={() => handleEditUser(user)}
-                            aria-label="Редактировать"
-                          />
-                        </Tooltip>
-                        <Tooltip label="Удалить">
-                          <IconButton
-                            size="sm"
-                            variant="ghost"
-                            icon={<Trash2 size={16} />}
-                            onClick={() => handleDeleteUser(user)}
-                            aria-label="Удалить"
-                            colorScheme="red"
-                          />
-                        </Tooltip>
-                      </HStack>
-                    </Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Box>
+          <BaseTable
+            rows={filteredUsers}
+            loading={isLoading}
+            columns={[
+              {
+                header: 'Пользователь',
+                field: (user: AdminUser) => (
+                  <HStack spacing={3}>
+                    <Avatar size="sm" name={`${user.firstName} ${user.lastName}`} />
+                    <VStack align="start" spacing={0}>
+                      <Text fontWeight="semibold">{user.firstName} {user.lastName}</Text>
+                      <Text fontSize="sm" color="gray.600">{user.gender === 'MALE' ? 'Мужской' : 'Женский'}</Text>
+                    </VStack>
+                  </HStack>
+                )
+              },
+              { header: 'Email', field: 'login' },
+              { header: 'Телефон', field: 'phone' },
+              {
+                header: 'Права',
+                field: (user: AdminUser) => (
+                  <Badge colorScheme={getPermissionColor(user.permissions)}>
+                    {getPermissionLabel(user.permissions)}
+                  </Badge>
+                )
+              },
+              { header: 'Дата создания', field: 'createdAt', isDateTime: true },
+            ]}
+            renderActions={(user: AdminUser) => (
+              <HStack spacing={2}>
+                <Tooltip label="Просмотр">
+                  <IconButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<Eye size={16} />}
+                    onClick={() => handleViewUser(user)}
+                    aria-label="Просмотр"
+                  />
+                </Tooltip>
+                <Tooltip label="Редактировать">
+                  <IconButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<Edit size={16} />}
+                    onClick={() => handleEditUser(user)}
+                    aria-label="Редактировать"
+                  />
+                </Tooltip>
+                <Tooltip label="Удалить">
+                  <IconButton
+                    size="sm"
+                    variant="ghost"
+                    icon={<Trash2 size={16} />}
+                    onClick={() => handleDeleteUser(user)}
+                    aria-label="Удалить"
+                    colorScheme="red"
+                  />
+                </Tooltip>
+              </HStack>
+            )}
+          />
         </CardBody>
       </Card>
 

@@ -32,6 +32,8 @@ import {
   Calendar,
   Users
 } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+import { requestList } from "../../../_api/crud";
 
 export interface AdminCourse {
   id: string;
@@ -58,60 +60,35 @@ interface CoursesManagementProps {
 
 export const CoursesManagement: React.FC<CoursesManagementProps> = ({ onBack }) => {
   const [courses, setCourses] = useState<AdminCourse[]>([]);
-  const [disciplines, setDisciplines] = useState<AdminDiscipline[]>([]);
+  const { data: disciplines = [] } = useQuery({
+    queryKey: ['admin', 'disciplines', 'list'],
+    queryFn: async () => await requestList<AdminDiscipline>('/api/discipline'),
+  });
+  const { data: coursesRaw = [] } = useQuery({
+    queryKey: ['admin', 'courses', 'list'],
+    queryFn: async () => await requestList<any>('/api/course'),
+  });
   const [filteredCourses, setFilteredCourses] = useState<AdminCourse[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
   const [selectedCourse, setSelectedCourse] = useState<AdminCourse | null>(null);
 
-  // Моковые данные
+  // Маппим курсы из API, подставляя объект дисциплины по disciplineId для отображения
   useEffect(() => {
-    const mockDisciplines: AdminDiscipline[] = [
-      { id: "1", title: "Математика" },
-      { id: "2", title: "Физика" },
-      { id: "3", title: "Химия" },
-      { id: "4", title: "История" },
-      { id: "5", title: "Литература" }
-    ];
-
-    const mockCourses: AdminCourse[] = [
-      {
-        id: "1",
-        title: "Алгебра и начала анализа",
-        description: "Курс по алгебре для 10-11 классов",
-        academicYear: 2024,
-        disciplineId: "1",
-        discipline: mockDisciplines[0],
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z"
-      },
-      {
-        id: "2",
-        title: "Механика",
-        description: "Основы механики для 10 класса",
-        academicYear: 2024,
-        disciplineId: "2",
-        discipline: mockDisciplines[1],
-        createdAt: "2024-01-02T00:00:00Z",
-        updatedAt: "2024-01-02T00:00:00Z"
-      },
-      {
-        id: "3",
-        title: "Органическая химия",
-        description: "Курс органической химии",
-        academicYear: 2024,
-        disciplineId: "3",
-        discipline: mockDisciplines[2],
-        createdAt: "2024-01-03T00:00:00Z",
-        updatedAt: "2024-01-03T00:00:00Z"
-      }
-    ];
-
-    setDisciplines(mockDisciplines);
-    setCourses(mockCourses);
-    setFilteredCourses(mockCourses);
-  }, []);
+    const mapped: AdminCourse[] = (coursesRaw as any[]).map((c: any) => ({
+      id: c.id,
+      title: c.title,
+      description: c.description,
+      academicYear: c.academicYear,
+      disciplineId: c.disciplineId,
+      discipline: disciplines.find(d => d.id === c.disciplineId) || { id: c.disciplineId, title: c.disciplineId },
+      createdAt: c.createdAt ?? new Date().toISOString(),
+      updatedAt: c.updatedAt ?? new Date().toISOString(),
+    }));
+    setCourses(mapped);
+    setFilteredCourses(mapped);
+  }, [coursesRaw, disciplines]);
 
   useEffect(() => {
     let filtered = courses;

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import React from "react";
 import { Sidebar } from "../";
 import {LinearGround} from "../decors";
+import { DevPanel } from "../dev/dev-panel";
 import {Splitter} from "antd";
 import {useSidebarStatus} from "../../store/sidebar-status.slice.ts";
 
@@ -18,6 +19,7 @@ export const Layout: React.FC = () => {
 	
 	return (
 		<div className="flex h-full w-full">
+			<DevPanel />
 			<Splitter
 				layout="horizontal"
 				onResize={(sizes: number[]) => sidebarChangeSize(sizes[0])}

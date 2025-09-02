@@ -2,12 +2,17 @@ import React, {useEffect, useRef} from "react";
 import module from "./sub-menu.module.css";
 import {SubMenuItem} from "./sub-menu-item.tsx";
 import {useActiveMenuStore} from "../../../store/active-menu.slice.ts";
-import {ISubMenuItem, sidebar} from "../../../constants.tsx";
+import type { ISubMenuItem } from "../../../constants.tsx";
+import { getSidebar } from "../../../lib/nav";
+import { useAuthStore } from "../../../store/auth.store";
 import {useSidebarStatus} from "../../../store/sidebar-status.slice.ts";
 
 export const SubMenu: React.FC = () => {
 	const { activeMenuIndex } = useActiveMenuStore();
 	const { size, isMinimalistic, setIsMinimalistic, isMainMenuMinimalistic } = useSidebarStatus();
+	const { user } = useAuthStore();
+	const role = (user?.permissions ?? 'STUDENT') as any;
+	const sidebar = getSidebar(role);
 	
 	const parentRef = useRef<HTMLDivElement | null>(null);
 	
@@ -30,7 +35,7 @@ export const SubMenu: React.FC = () => {
 				<span>{sidebar[activeMenuIndex].icon}</span>
 			</div>
 			<div className="w-[calc(100%-20px)] bg-[var(--second-light-color)] h-[1px] mx-auto" />
-			<div className="flex flex-col w-full pl-[10px] relative">{sidebar[activeMenuIndex].sub.map((item: ISubMenuItem) => (
+            <div className="flex flex-col w-full pl-[10px] relative">{sidebar[activeMenuIndex].sub.map((item: any) => (
 					<SubMenuItem
 						key={item.id}
 						icon={item.icon}

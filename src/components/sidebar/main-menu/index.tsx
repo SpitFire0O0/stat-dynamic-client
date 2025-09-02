@@ -7,7 +7,8 @@ import {
 import {MainMenuItem} from "./main-menu-item.tsx";
 import clsx from "clsx";
 import {CompanyLogo} from "../../decors";
-import {sidebar} from "../../../constants.tsx";
+import { getSidebar } from "../../../lib/nav";
+import { useAuthStore } from "../../../store/auth.store";
 import {Link} from "react-router-dom";
 import {useSidebarStatus} from "../../../store/sidebar-status.slice.ts";
 
@@ -15,6 +16,9 @@ import {useSidebarStatus} from "../../../store/sidebar-status.slice.ts";
 export const MainMenu: React.FC = () => {
 	const { isMainMenuMinimalistic, setIsMainMenuMinimalistic } = useSidebarStatus();
 	const { size } = useSidebarStatus();
+	const { user } = useAuthStore();
+	const role = (user?.permissions ?? 'STUDENT') as any;
+	const sidebar = getSidebar(role);
 	
 	return (
 		<div className={clsx(

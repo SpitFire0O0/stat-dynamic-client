@@ -9,3 +9,7 @@ export { ErrorPage } from "./error";
 export { AuthPage } from "./auth";
 export { MessagesPage } from "./messages";
 export { AdminPage } from "./admin";
+export { AdminCrudPage } from "./admin-crud";
+export { AdminCrudHome } from "./admin-crud/home";
+export { AdminCrudEntityPage } from "./admin-crud/entity";
+export { ClubsPage } from "./clubs";

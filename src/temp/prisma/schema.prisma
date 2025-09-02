@@ -1,0 +1,362 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(uuid())
+
+  login       String      @unique
+  password    String
+  firstName   String      @map("first_name")
+  lastName    String      @map("last_name")
+  birthday    DateTime?
+  phone       String?
+  address     String?
+  logo        String?      @unique
+  logoFile    File?        @relation("user_logo", fields: [logo], references: [id])
+  gender      Genders     @default(MALE)
+  permissions Permissions @default(STUDENT)
+
+  contacts          Contact[]
+  grades            Grade[]           @relation("student_grades")
+  teacherGreades    Grade[]           @relation("teacher_grades")
+  studentPriorities StudentPriority[]
+  feedbacks         Feedback[]
+  achievements      Achievement[]
+  groups            Group[]           @relation("group_students")
+  curatorGroups     Group[]           @relation("group_curator")
+  messages          Message[]
+  dialogs           Dialog[]          @relation("dialog_users")
+  meetings          Meeting[]
+  meetingUsers      MeetingUsers[]
+  homeworkStudents  Homework[]        @relation("homework_students")
+  homeworkCurator   Homework[]        @relation("homework_curator")
+  userToken         UserToken?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model UserToken {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique @map("user_id")
+
+  token String
+
+  @@map("user_tokens")
+}
+
+model Contact {
+  id String @id @default(uuid())
+
+  type    ContactTypes
+  content String       @unique
+
+  user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@map("contacts")
+}
+
+model StudentPriority {
+  studentGrade   Grades @default(B) @map("student_grade")
+  actualityGrade Grades @default(B) @map("actuality_grade")
+
+  user     User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId   String @map("user_id")
+  course   Course @relation(references: [id], fields: [courseId], onDelete: Cascade)
+  courseId String @map("course_id")
+
+  @@id([userId, courseId])
+  @@map("student_priorities")
+}
+
+model Course {
+  id String @id @default(uuid())
+
+  title        String
+  description  String?
+  academicYear Int
+
+  discipline      Discipline        @relation(references: [id], fields: [disciplineId], onDelete: NoAction)
+  disciplineId    String            @map("discipline_id")
+  grades          Grade[]
+  themes          Theme[]
+  studentPriority StudentPriority[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("courses")
+}
+
+model Discipline {
+  id String @id @default(uuid())
+
+  title String @unique
+
+  courses Course[]
+
+  @@map("disciplines")
+}
+
+model Theme {
+  id String @id @default(uuid())
+
+  course   Course @relation(references: [id], fields: [courseId], onDelete: Cascade)
+  courseId String @map("course_id")
+
+  title     String
+  dateBegin DateTime @map("date_begin")
+  dateEnd   DateTime @map("date_end")
+
+  grades    Grade[]
+  homeworks Homework[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("themes")
+}
+
+model Grade {
+  id String @id @default(uuid())
+
+  grade Grades     @default(C)
+  type  GradeTypes @default(HOMEWORK)
+
+  student          User              @relation("student_grades", references: [id], fields: [studentId], onDelete: NoAction)
+  studentId        String            @map("student_id")
+  teacher          User?             @relation("teacher_grades", references: [id], fields: [teacherId], onDelete: NoAction)
+  teacherId        String?           @map("teacher_id")
+  course           Course            @relation(references: [id], fields: [courseId], onDelete: NoAction)
+  courseId         String            @map("course_id")
+  theme            Theme             @relation(references: [id], fields: [themeId], onDelete: NoAction)
+  themeId          String            @map("theme_id")
+  studentHomeworks StudentHomework[] @relation("student_homework_grades")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("grades")
+}
+
+model Feedback {
+  id String @id @default(uuid())
+
+  title   String
+  content String?
+  grade   Grades  @default(C)
+
+  user     User      @relation(references: [id], fields: [userId], onDelete: NoAction)
+  userId   String    @map("user_id")
+  meetings Meeting[] @relation("meeting_feedbacks")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("feedbacks")
+}
+
+model Achievement {
+  id String @id @default(uuid())
+
+  title   String
+  content String?
+  grade   Int?
+
+  user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId String @map("user_id")
+  files  File[] @relation("achievement_files")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("achievements")
+}
+
+model Group {
+  id String @id @default(uuid())
+
+  name        String
+  slug        String  @unique
+  description String?
+
+  curator   User   @relation("group_curator", references: [id], fields: [curatorId])
+  curatorId String @map("curator_id")
+  students  User[] @relation("group_students")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("groups")
+}
+
+model Dialog {
+  id String @id @default(uuid())
+
+  title String
+
+  messages Message[]
+  users    User[]    @relation("dialog_users")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("dialogs")
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  content String?
+
+  author   User   @relation(references: [id], fields: [authorId], onDelete: SetNull)
+  authorId String @map("author_id")
+  dialog   Dialog @relation(references: [id], fields: [dialogId], onDelete: Cascade)
+  dialogId String @map("dialog_id")
+  files    File[] @relation("message_files")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("messages")
+}
+
+model Meeting {
+  id String @id @default(uuid())
+
+  title     String
+  content   String?
+  type      MeetingTypes @default(LESSON)
+  dateBegin DateTime     @map("date_begin")
+  duration  DateTime
+
+  curator      User           @relation(references: [id], fields: [curatorId], onDelete: SetNull)
+  curatorId    String         @map("curator_id")
+  meetingUsers MeetingUsers[]
+  feedbacks    Feedback[]     @relation("meeting_feedbacks")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("meetings")
+}
+
+model MeetingUsers {
+  meeting   Meeting @relation(references: [id], fields: [meetingId], onDelete: Cascade)
+  meetingId String  @map("meeting_id")
+  user      User    @relation(references: [id], fields: [userId], onDelete: Cascade)
+  userId    String  @map("user_id")
+
+  is_attendace Boolean @default(false)
+
+  @@id([meetingId, userId])
+  @@map("meeting_users")
+}
+
+model Homework {
+  id String @id @default(uuid())
+
+  title     String
+  content   String?
+  dateBegin DateTime @map("date_begin")
+  dateEnd   DateTime @map("date_end")
+
+  students         User[]            @relation("homework_students")
+  curator          User              @relation("homework_curator", references: [id], fields: [curatorId], onDelete: SetNull)
+  curatorId        String            @map("curator_id")
+  theme            Theme             @relation(references: [id], fields: [themeId], onDelete: SetNull)
+  themeId          String            @map("theme_id")
+  studentHomeworks StudentHomework[]
+  files            File[]            @relation("homework_files")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("homeworks")
+}
+
+model StudentHomework {
+  id String @id @default(uuid())
+
+  title   String
+  content String?
+  date    DateTime
+
+  homework   Homework @relation(references: [id], fields: [homeworkId], onDelete: Cascade)
+  homeworkId String   @map("homework_id")
+  grades     Grade[]  @relation("student_homework_grades")
+  files      File[]   @relation("student_homework_files")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("student_homeworks")
+}
+
+model File {
+  id String @id @default(uuid())
+
+  path String
+  type FileTypes
+
+  messages         Message[]         @relation("message_files")
+  homeworks        Homework[]        @relation("homework_files")
+  studentHomeworks StudentHomework[] @relation("student_homework_files")
+  achievements     Achievement[]     @relation("achievement_files")
+  userLogos        User[]            @relation("user_logo")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("files")
+}
+
+enum Genders {
+  MALE
+  FEMALE
+}
+
+enum Permissions {
+  ADMIN
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+enum ContactTypes {
+  TELEGRAM
+  DISCORD
+  VKONTAKTE
+  WHATSAPP
+}
+
+enum Grades {
+  A
+  B
+  C
+}
+
+enum GradeTypes {
+  HOMEWORK
+  TEST
+  EXAM
+}
+
+enum MeetingTypes {
+  LESSON
+  EXAM
+  EVENT
+}
+
+enum FileTypes {
+  MEDIA
+  DOC
+}
