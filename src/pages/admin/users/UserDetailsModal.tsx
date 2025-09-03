@@ -25,7 +25,7 @@ import {
   Shield,
   Clock
 } from "lucide-react";
-import { AdminUser } from "./UsersManagement";
+import type { AdminUser } from "../types";
 
 interface UserDetailsModalProps {
   isOpen: boolean;

@@ -5,15 +5,9 @@ import { createMiddleware } from './middleware';
 
 // Базовый URL берём из ENV с запасным значением
 export const apiBaseUrl =
-  (import.meta as any)?.env?.VITE_API_BASE_URL ?? 'http://localhost:6000/api';
+  (import.meta as any)?.env?.VITE_API_BASE_URL ?? 'http://localhost:6001';
 
 export const apiClient = createClient<paths>({ baseUrl: apiBaseUrl });
 
-// Подключаем минимальный middleware (заголовки/авторизация)
+// Подключаем минимальный middleware
 apiClient.use(createMiddleware());
-
-// Полезные заметки по использованию:
-// apiClient
-//   .path('/api/users')
-//   .method('get')
-//   .create()();

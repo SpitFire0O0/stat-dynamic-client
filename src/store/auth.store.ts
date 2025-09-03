@@ -35,8 +35,22 @@ type AuthStore = AuthState & AuthActions;
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      user: null,
-      isAuthenticated: false,
+      // Пользователь по умолчанию: ADMIN (для быстрого доступа в DEV)
+      user: {
+        id: 'dev-admin',
+        login: 'admin@example.com',
+        firstName: 'Dev',
+        lastName: 'Admin',
+        birthday: new Date('2000-01-01').toISOString(),
+        phone: '+7 (999) 000-00-00',
+        address: 'Dev City',
+        logo: undefined,
+        gender: 'MALE',
+        permissions: 'ADMIN',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+      isAuthenticated: true,
       accessToken: null,
       refreshToken: null,
 

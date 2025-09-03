@@ -52,7 +52,7 @@ export const DisciplinesManagement: React.FC<DisciplinesManagementProps> = ({ on
   const [filteredDisciplines, setFilteredDisciplines] = useState<AdminDiscipline[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [creditsFilter, setCreditsFilter] = useState<string>("all");
-  const [selectedDiscipline, setSelectedDiscipline] = useState<AdminDiscipline | null>(null);
+  const [, setSelectedDiscipline] = useState<AdminDiscipline | null>(null);
 
   // Моковые данные
   useEffect(() => {

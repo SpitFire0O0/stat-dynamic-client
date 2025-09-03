@@ -15,7 +15,6 @@ import {
   Td,
   Badge,
   IconButton,
-  useDisclosure,
   Input,
   InputGroup,
   InputLeftElement,
@@ -33,6 +32,7 @@ import {
   Users
 } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
+// Используем типобезопасный список из нового CRUD-слоя
 import { requestList } from "../../../_api/crud";
 
 export interface AdminCourse {
@@ -62,6 +62,7 @@ export const CoursesManagement: React.FC<CoursesManagementProps> = ({ onBack }) 
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const { data: disciplines = [] } = useQuery({
     queryKey: ['admin', 'disciplines', 'list'],
+    // requestList принимает только пути с GET согласно схеме
     queryFn: async () => await requestList<AdminDiscipline>('/api/discipline'),
   });
   const { data: coursesRaw = [] } = useQuery({
@@ -72,7 +73,7 @@ export const CoursesManagement: React.FC<CoursesManagementProps> = ({ onBack }) 
   const [searchQuery, setSearchQuery] = useState("");
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
-  const [selectedCourse, setSelectedCourse] = useState<AdminCourse | null>(null);
+  const [, setSelectedCourse] = useState<AdminCourse | null>(null);
 
   // Маппим курсы из API, подставляя объект дисциплины по disciplineId для отображения
   useEffect(() => {

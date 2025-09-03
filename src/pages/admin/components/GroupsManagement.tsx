@@ -69,7 +69,7 @@ export const GroupsManagement: React.FC<GroupsManagementProps> = ({ onBack }) =>
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>("all");
-  const [selectedGroup, setSelectedGroup] = useState<AdminGroup | null>(null);
+  const [, setSelectedGroup] = useState<AdminGroup | null>(null);
 
   // Моковые данные
   useEffect(() => {

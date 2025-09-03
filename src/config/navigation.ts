@@ -82,11 +82,11 @@ export const navigation: NavItem[] = [
   {
     id: 6,
     label: 'Админка',
-    url: '/admin/crud',
+    url: '/admin',
     icon: 'settings',
     roles: ['ADMIN'],
     sub: [
-      { id: 0, label: 'CRUD', url: '/admin/crud', icon: 'settings' },
+      { id: 0, label: 'Панель', url: '/admin', icon: 'settings' },
     ],
   },
 ];

@@ -16,10 +16,8 @@ export const useAuth = () => {
     queryFn: authApi.getCurrentUser,
     enabled: isAuthenticated,
     retry: false,
-    onError: () => {
-      logoutStore();
-      navigate('/auth');
-    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   // Mutation для входа
@@ -103,7 +101,8 @@ export const useAuth = () => {
   };
 
   return {
-    user: currentUser || user,
+    // В DEV-режиме или при локальном переключении ролей отдаем пользователя из стора в приоритете
+    user: user || currentUser,
     isAuthenticated,
     isLoading: loginMutation.isPending || logoutMutation.isPending || isLoadingUser,
     login,

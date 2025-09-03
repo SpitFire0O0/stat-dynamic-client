@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { 
   Box, 
-  Flex, 
   VStack, 
   HStack, 
   Text, 
@@ -10,7 +9,6 @@ import {
   Card, 
   CardBody,
   Grid,
-  Icon,
   useColorModeValue
 } from "@chakra-ui/react";
 import { 
@@ -21,15 +19,11 @@ import {
   MessageSquare, 
   Award, 
   FileText, 
-  Settings,
-  Plus,
-  Edit,
-  Trash2,
-  Eye
+  Plus
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import type { User } from "../../store/auth.store";
-import { UsersManagement } from "./components/UsersManagement";
+import { UsersManagement } from "./users/UsersManagement";
 import { CoursesManagement } from "./components/CoursesManagement";
 import { GroupsManagement } from "./components/GroupsManagement";
 import { DisciplinesManagement } from "./components/DisciplinesManagement";
@@ -130,8 +124,9 @@ const adminMenuItems: AdminMenuItem[] = [
 export const AdminPage: React.FC = () => {
   const { user } = useAuth();
   const [selectedSection, setSelectedSection] = useState<AdminSection | null>(null);
-  const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
+  // цвета не используются прямо сейчас, оставим только хук для возможного применения
+  useColorModeValue("white", "gray.800");
+  useColorModeValue("gray.200", "gray.700");
 
   // Проверка прав администратора
   if ((user as User)?.permissions !== "ADMIN") {

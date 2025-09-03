@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/users/paged": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UserController-findAllPaged"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/users/{id}": {
         parameters: {
             query?: never;
@@ -608,10 +624,206 @@ export interface paths {
         patch: operations["HomeworkController-update"];
         trace?: never;
     };
+    "/api/homework/{id}/assign-student": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["HomeworkController-assignStudent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/homework/{id}/remove-student": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["HomeworkController-removeStudent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Загрузить файл */
+        post: operations["FileController-uploadFile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/logo/upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Загрузить логотип пользователя */
+        post: operations["FileController-uploadLogo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/logo/update/{fileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Обновить логотип пользователя */
+        post: operations["FileController-updateLogo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить логотип текущего пользователя */
+        get: operations["FileController-getCurrentUserLogo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/logo/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить логотип пользователя по ID */
+        get: operations["FileController-getUserLogo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получить информацию о файле */
+        get: operations["FileController-getFile"];
+        put?: never;
+        post?: never;
+        /** Удалить файл */
+        delete: operations["FileController-deleteFile"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/files/download/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Скачать файл */
+        get: operations["FileController-downloadFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health check */
+        get: operations["HealthController-check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Readiness check */
+        get: operations["HealthController-ready"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description User Gender
+         * @enum {string}
+         */
+        Genders: "MALE" | "FEMALE";
+        /**
+         * @description User Permission
+         * @enum {string}
+         */
+        Permissions: "ADMIN" | "TEACHER" | "PARENT" | "STUDENT";
         CreateUserDto: {
             /**
              * @description User Login
@@ -638,31 +850,199 @@ export interface components {
              * @description User Birthday
              * @example 2010-01-01T03:00:00.002Z
              */
-            birthday: string;
+            birthday?: string;
             /**
              * @description User Phone number
              * @example 81230000000
              */
-            phone: string;
+            phone?: string;
             /**
              * @description User Address
              * @example Россия, г. Москва, ул. Ленина, д. 10, кв. 10
              */
-            address: string;
+            address?: string;
+            /**
+             * @description User Logo ID
+             * @example uuid-here
+             */
+            logo?: string;
             /**
              * @description User Gender
              * @example MALE
-             * @enum {string}
              */
-            gender: "MALE" | "FEMALE";
+            gender?: components["schemas"]["Genders"];
             /**
              * @description User Permission
              * @example USER
-             * @enum {string}
              */
-            permissions: "ADMIN" | "TEACHER" | "PARENT" | "STUDENT";
+            permissions?: components["schemas"]["Permissions"];
         };
-        UpdateUserDto: Record<string, never>;
+        UserDto: {
+            /**
+             * @description User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            id: string;
+            /**
+             * @description User login
+             * @example user@example.com
+             */
+            login: string;
+            /**
+             * @description First name
+             * @example Иван
+             */
+            firstName: string;
+            /**
+             * @description Last name
+             * @example Иванов
+             */
+            lastName: string;
+            /**
+             * Format: date-time
+             * @description Birthday
+             * @example 2010-01-01T03:00:00.000Z
+             */
+            birthday: string | null;
+            /**
+             * @description Phone number
+             * @example 81230000000
+             */
+            phone: string | null;
+            /**
+             * @description Address
+             * @example Россия, Москва, ул. Ленина, д. 10
+             */
+            address: string | null;
+            /**
+             * @description Logo File ID
+             * @example 0a9f4d3e-bd6c-4c6a-bdf6-9d7a2f1e3c1b
+             */
+            logo: string | null;
+            /**
+             * @description Gender
+             * @example MALE
+             */
+            gender: components["schemas"]["Genders"];
+            /**
+             * @description Permissions
+             * @example STUDENT
+             */
+            permissions: components["schemas"]["Permissions"];
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
+        ErrorDto: {
+            /** @example 400 */
+            statusCode: number;
+            /** @example 2025-01-01T12:00:00.000Z */
+            timestamp: string;
+            /** @example /api/users */
+            path: string;
+            /** @example GET */
+            method: string;
+            /** @example Validation failed */
+            message: Record<string, never>;
+            /** @example Bad Request */
+            error: string;
+        };
+        PaginatedDto: Record<string, never>;
+        PageMetaDto: {
+            /** @description Total number of items */
+            totalItems?: number;
+            /** @description Items on current page */
+            itemCount?: number;
+            /** @description Current page (1-based) */
+            page?: number;
+            /** @description Items per page */
+            limit?: number;
+            /** @description Total number of pages */
+            totalPages?: number;
+            /** @description Has previous page */
+            hasPrevPage?: boolean;
+            /** @description Has next page */
+            hasNextPage?: boolean;
+        };
+        UpdateUserDto: {
+            /**
+             * @description User Login
+             * @example example@email.com
+             */
+            login?: string;
+            /**
+             * @description User Password
+             * @example !Qwert123
+             */
+            password?: string;
+            /**
+             * @description User First name
+             * @example Дмитрий
+             */
+            firstName?: string;
+            /**
+             * @description User Last name
+             * @example Иванов
+             */
+            lastName?: string;
+            /**
+             * Format: date-time
+             * @description User Birthday
+             * @example 2010-01-01T03:00:00.002Z
+             */
+            birthday?: string;
+            /**
+             * @description User Phone number
+             * @example 81230000000
+             */
+            phone?: string;
+            /**
+             * @description User Address
+             * @example Россия, г. Москва, ул. Ленина, д. 10, кв. 10
+             */
+            address?: string;
+            /**
+             * @description User Logo ID
+             * @example uuid-here
+             */
+            logo?: string;
+            /**
+             * @description User Gender
+             * @example MALE
+             */
+            gender?: components["schemas"]["Genders"];
+            /**
+             * @description User Permission
+             * @example USER
+             */
+            permissions?: components["schemas"]["Permissions"];
+        };
+        AuthDTO: {
+            /** @description Authenticated user */
+            user: components["schemas"]["UserDto"];
+            /**
+             * @description JWT access token
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+             */
+            accessToken: string;
+            /**
+             * @description JWT refresh token
+             * @example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+             */
+            refreshToken: string;
+        };
+        /**
+         * @description Contact Type
+         * @enum {string}
+         */
+        ContactTypes: "TELEGRAM" | "DISCORD" | "VKONTAKTE" | "WHATSAPP";
         CreateContactDto: {
             /**
              * @description Contact User ID
@@ -672,16 +1052,58 @@ export interface components {
             /**
              * @description Contact Type
              * @example TELEGRAM
-             * @enum {string}
              */
-            type: "TELEGRAM" | "DISCORD" | "VKONTAKTE" | "WHATSAPP";
+            type: components["schemas"]["ContactTypes"];
             /**
              * @description Contact Content
              * @example @example
              */
             content: string;
         };
-        UpdateContactDto: Record<string, never>;
+        ContactDto: {
+            /**
+             * @description Contact ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            id: string;
+            /**
+             * @description Contact type
+             * @example TELEGRAM
+             */
+            type: components["schemas"]["ContactTypes"];
+            /**
+             * @description Contact value
+             * @example @username
+             */
+            content: string;
+            /**
+             * @description User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId: string;
+        };
+        UpdateContactDto: {
+            /**
+             * @description Contact User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId?: string;
+            /**
+             * @description Contact Type
+             * @example TELEGRAM
+             */
+            type?: components["schemas"]["ContactTypes"];
+            /**
+             * @description Contact Content
+             * @example @example
+             */
+            content?: string;
+        };
+        /**
+         * @description Feedback Grade
+         * @enum {string}
+         */
+        Grades: "A" | "B" | "C";
         CreateFeedbackDto: {
             /**
              * @description Feedback User ID
@@ -701,11 +1123,68 @@ export interface components {
             /**
              * @description Feedback Grade
              * @example A
-             * @enum {string}
              */
-            grade: "A" | "B" | "C";
+            grade: components["schemas"]["Grades"];
         };
-        UpdateFeedbackDto: Record<string, never>;
+        FeedbackDto: {
+            /**
+             * @description Feedback ID
+             * @example a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6
+             */
+            id: string;
+            /**
+             * @description Title
+             * @example Комментарий к занятию
+             */
+            title: string;
+            /**
+             * @description Content
+             * @example Все прошло отлично
+             */
+            content: Record<string, never> | null;
+            /**
+             * @description Grade
+             * @example A
+             */
+            grade: components["schemas"]["Grades"];
+            /**
+             * @description Author user ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
+        UpdateFeedbackDto: {
+            /**
+             * @description Feedback User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId?: string;
+            /**
+             * @description Feedback Title
+             * @example Алгебра 01.01.2025
+             */
+            title?: string;
+            /**
+             * @description Feedback Content
+             * @example Занятие в целом прошло отлично, но я бы уделил больше внимания на решение уравнений у доски для более точного усвоения и понимания пройденного материала
+             */
+            content?: string;
+            /**
+             * @description Feedback Grade
+             * @example A
+             */
+            grade?: components["schemas"]["Grades"];
+        };
         CreateAchievementDto: {
             /**
              * @description Achievement User ID
@@ -728,7 +1207,65 @@ export interface components {
              */
             grade: number;
         };
-        UpdateAchievementDto: Record<string, never>;
+        AchievementDto: {
+            /**
+             * @description Achievement ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            id: string;
+            /**
+             * @description Title
+             * @example Олимпиада по математике
+             */
+            title: string;
+            /**
+             * @description Content
+             * @example Победа в городском этапе
+             */
+            content: Record<string, never> | null;
+            /**
+             * @description Numeric grade
+             * @example 5
+             */
+            grade: Record<string, never> | null;
+            /**
+             * @description User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
+        UpdateAchievementDto: {
+            /**
+             * @description Achievement User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId?: string;
+            /**
+             * @description Achievement Title
+             * @example Олимпиада по программированию 2025
+             */
+            title?: string;
+            /**
+             * @description Achievement Content
+             * @example Описание олимпиады, даты проведения, условия и т.п.
+             */
+            content?: string;
+            /**
+             * @description Achievement Grade
+             * @example 90
+             */
+            grade?: number;
+        };
         CreateGroupDto: {
             /**
              * @description Group Name
@@ -751,22 +1288,54 @@ export interface components {
              */
             curatorId: string;
         };
-        GroupResponse: {
+        GroupDto: {
             /**
              * @description Group ID
-             * @example 5bce5e72-925c-4f5c-a6f6-886257d4170e
+             * @example b2f2b6fe-1b3d-4c1e-9a77-1d2f3a4b5c6d
              */
             id: string;
             /**
-             * @description Group Name
+             * @description Group name
              * @example 11-2024
              */
             name: string;
             /**
-             * @description Group Slug
+             * @description Slug
              * @example 11-2024
              */
             slug: string;
+            /**
+             * @description Description
+             * @example Группа 11 класса 2024
+             */
+            description: Record<string, never> | null;
+            /**
+             * @description Curator ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            curatorId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
+        UpdateGroupDto: {
+            /**
+             * @description Group Name
+             * @example 11-2024
+             */
+            name?: string;
+            /**
+             * @description Group Slug
+             * @example 11-2024
+             */
+            slug?: string;
             /**
              * @description Description
              * @example Group for 11 class 2024 year
@@ -776,9 +1345,8 @@ export interface components {
              * @description Curator ID of Group
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
              */
-            curatorId: string;
+            curatorId?: string;
         };
-        UpdateGroupDto: Record<string, never>;
         CreateCourseDto: {
             /**
              * @description Course Title
@@ -800,6 +1368,43 @@ export interface components {
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
              */
             disciplineId: string;
+        };
+        CourseDto: {
+            /**
+             * @description Course ID
+             * @example d1a9a1c8-1a2b-3c4d-5e6f-7a8b9c0d1e2f
+             */
+            id: string;
+            /**
+             * @description Course title
+             * @example АЛГ-25
+             */
+            title: string;
+            /**
+             * @description Course description
+             * @example Курс Алгебры для потока 2025
+             */
+            description: Record<string, never> | null;
+            /**
+             * @description Academic year
+             * @example 2025
+             */
+            academicYear: number;
+            /**
+             * @description Discipline ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            disciplineId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
         };
         UpdateCourseDto: {
             /**
@@ -827,6 +1432,18 @@ export interface components {
             /**
              * @description Feedback Title
              * @example Алгебра
+             */
+            title: string;
+        };
+        DisciplineDto: {
+            /**
+             * @description Discipline ID
+             * @example d7b3b1f2-5c6a-4e1f-9a77-1d2f3a4b5c6d
+             */
+            id: string;
+            /**
+             * @description Discipline title
+             * @example Математика
              */
             title: string;
         };
@@ -861,6 +1478,43 @@ export interface components {
              */
             dateEnd: string;
         };
+        ThemeDto: {
+            /**
+             * @description Theme ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            id: string;
+            /**
+             * @description Course ID
+             * @example c2a3e4d5-6b7c-8d9e-0f1a-2b3c4d5e6f70
+             */
+            courseId: string;
+            /**
+             * @description Theme title
+             * @example Тема 1. Введение
+             */
+            title: string;
+            /**
+             * Format: date-time
+             * @description Begin date
+             */
+            dateBegin?: string;
+            /**
+             * Format: date-time
+             * @description End date
+             */
+            dateEnd?: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
         UpdateThemeDto: {
             /**
              * @description Theme Course ID
@@ -889,15 +1543,13 @@ export interface components {
             /**
              * @description Priority Student grade
              * @example A
-             * @enum {string}
              */
-            studentGrade: "A" | "B" | "C";
+            studentGrade: components["schemas"]["Grades"];
             /**
              * @description Priority Activity grade
              * @example B
-             * @enum {string}
              */
-            actualityGrade: "A" | "B" | "C";
+            actualityGrade: components["schemas"]["Grades"];
             /**
              * @description Priority User ID
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
@@ -909,19 +1561,39 @@ export interface components {
              */
             courseId: string;
         };
+        UserPriorityDto: {
+            /**
+             * @description Student self grade
+             * @example B
+             */
+            studentGrade: components["schemas"]["Grades"];
+            /**
+             * @description Actual grade
+             * @example A
+             */
+            actualityGrade: components["schemas"]["Grades"];
+            /**
+             * @description User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId: string;
+            /**
+             * @description Course ID
+             * @example c2a3e4d5-6b7c-8d9e-0f1a-2b3c4d5e6f70
+             */
+            courseId: string;
+        };
         UpdateUserPriorityDto: {
             /**
              * @description Priority Student grade
              * @example A
-             * @enum {string}
              */
-            studentGrade?: "A" | "B" | "C";
+            studentGrade?: components["schemas"]["Grades"];
             /**
              * @description Priority Activity grade
              * @example B
-             * @enum {string}
              */
-            actualityGrade?: "A" | "B" | "C";
+            actualityGrade?: components["schemas"]["Grades"];
             /**
              * @description Priority User ID
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
@@ -933,18 +1605,22 @@ export interface components {
              */
             courseId?: string;
         };
+        /**
+         * @description Grade Type
+         * @enum {string}
+         */
+        GradeTypes: "HOMEWORK" | "TEST" | "EXAM";
         CreateGradeDto: {
             /**
              * @description Grade Value
              * @example A
              */
-            grade: string;
+            grade: components["schemas"]["Grades"];
             /**
              * @description Grade Type
              * @example HOMEWORK
-             * @enum {string}
              */
-            type: "HOMEWORK" | "TEST" | "EXAM";
+            type: components["schemas"]["GradeTypes"];
             /**
              * @description Grade Student ID
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
@@ -966,18 +1642,64 @@ export interface components {
              */
             themeId: string;
         };
+        GradeDto: {
+            /**
+             * @description Grade ID
+             * @example e1f2a3b4-c5d6-7e8f-9012-3456789abcde
+             */
+            id: string;
+            /**
+             * @description Grade value
+             * @example B
+             */
+            grade: components["schemas"]["Grades"];
+            /**
+             * @description Grade type
+             * @example TEST
+             */
+            type: components["schemas"]["GradeTypes"];
+            /**
+             * @description Student ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            studentId: string;
+            /**
+             * @description Teacher ID
+             * @example b1a2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6
+             */
+            teacherId: Record<string, never> | null;
+            /**
+             * @description Course ID
+             * @example c2a3e4d5-6b7c-8d9e-0f1a-2b3c4d5e6f70
+             */
+            courseId: string;
+            /**
+             * @description Theme ID
+             * @example a13b82d5-4e6f-7a8b-9c0d-e1f2a3b4c5d6
+             */
+            themeId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
         UpdateGradeDto: {
             /**
              * @description Grade Value
              * @example A
              */
-            grade?: string;
+            grade?: components["schemas"]["Grades"];
             /**
              * @description Grade Type
              * @example HOMEWORK
-             * @enum {string}
              */
-            type?: "HOMEWORK" | "TEST" | "EXAM";
+            type?: components["schemas"]["GradeTypes"];
             /**
              * @description Grade Student ID
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
@@ -999,6 +1721,11 @@ export interface components {
              */
             themeId?: string;
         };
+        /**
+         * @description Meeting Type
+         * @enum {string}
+         */
+        MeetingTypes: "LESSON" | "EXAM" | "EVENT";
         CreateMeetingDto: {
             /**
              * @description Meeting Title
@@ -1013,9 +1740,8 @@ export interface components {
             /**
              * @description Meeting Type
              * @example LESSON
-             * @enum {string}
              */
-            type: "LESSON" | "EXAM" | "EVENT";
+            type: components["schemas"]["MeetingTypes"];
             /**
              * Format: date-time
              * @description Meeting Date begin
@@ -1034,6 +1760,53 @@ export interface components {
              */
             curatorId: string;
         };
+        MeetingDto: {
+            /**
+             * @description Meeting ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            id: string;
+            /**
+             * @description Title
+             * @example Урок 1
+             */
+            title: string;
+            /**
+             * @description Content
+             * @example Вводная лекция
+             */
+            content: Record<string, never> | null;
+            /**
+             * @description Type
+             * @example LESSON
+             */
+            type: components["schemas"]["MeetingTypes"];
+            /**
+             * Format: date-time
+             * @description Start date
+             */
+            dateBegin: string;
+            /**
+             * Format: date-time
+             * @description Duration
+             */
+            duration: string;
+            /**
+             * @description Curator ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            curatorId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
         UpdateMeetingDto: {
             /**
              * @description Meeting Title
@@ -1048,9 +1821,8 @@ export interface components {
             /**
              * @description Meeting Type
              * @example LESSON
-             * @enum {string}
              */
-            type?: "LESSON" | "EXAM" | "EVENT";
+            type?: components["schemas"]["MeetingTypes"];
             /**
              * Format: date-time
              * @description Meeting Date begin
@@ -1068,6 +1840,23 @@ export interface components {
              * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
              */
             curatorId?: string;
+        };
+        MeetingUsersDto: {
+            /**
+             * @description Meeting ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            meetingId: string;
+            /**
+             * @description User ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            userId: string;
+            /**
+             * @description Attendance flag
+             * @example true
+             */
+            is_attendace: boolean;
         };
         CreateHomeworkDto: {
             /**
@@ -1103,6 +1892,53 @@ export interface components {
              */
             themeId: string;
         };
+        HomeworkDto: {
+            /**
+             * @description Homework ID
+             * @example e3d2c1b0-a9f8-7654-3210-fedcba987654
+             */
+            id: string;
+            /**
+             * @description Title
+             * @example ДЗ №1
+             */
+            title: string;
+            /**
+             * @description Content
+             * @example Решить задачи 1-10
+             */
+            content: Record<string, never> | null;
+            /**
+             * Format: date-time
+             * @description Start date
+             */
+            dateBegin: string;
+            /**
+             * Format: date-time
+             * @description End date
+             */
+            dateEnd: string;
+            /**
+             * @description Curator user ID
+             * @example f7c5208d-911c-43db-84aa-19eda9ae50a5
+             */
+            curatorId: string;
+            /**
+             * @description Theme ID
+             * @example a13b82d5-4e6f-7a8b-9c0d-e1f2a3b4c5d6
+             */
+            themeId: string;
+            /**
+             * Format: date-time
+             * @description Created at
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Updated at
+             */
+            updatedAt: string;
+        };
         UpdateHomeworkDto: {
             /**
              * @description Homework Title
@@ -1137,6 +1973,32 @@ export interface components {
              */
             themeId?: string;
         };
+        /**
+         * @description Тип файла
+         * @enum {string}
+         */
+        FileTypes: "MEDIA" | "DOC";
+        FileDto: {
+            /** @description ID файла */
+            id: string;
+            /** @description Путь к файлу */
+            path: string;
+            /** @description Тип файла */
+            type: components["schemas"]["FileTypes"];
+            /**
+             * Format: date-time
+             * @description Дата создания
+             */
+            createdAt: string;
+            /** @description URL для доступа к файлу */
+            url: string;
+        };
+        UploadResponseDto: {
+            /** @description Сообщение об успешной загрузке */
+            message: string;
+            /** @description Информация о загруженном файле */
+            file: components["schemas"]["FileDto"];
+        };
     };
     responses: never;
     parameters: never;
@@ -1159,7 +2021,17 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
             };
         };
     };
@@ -1180,7 +2052,68 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+        };
+    };
+    "UserController-findAllPaged": {
+        parameters: {
+            query?: {
+                /** @description Page number (1-based) */
+                page?: number;
+                /** @description Items per page */
+                limit?: number;
+                /** @description Sort by field */
+                sortBy?: string;
+                /** @description Sort order */
+                sortOrder?: "asc" | "desc";
+                /** @description Full-text query (contains, case-insensitive) */
+                q?: string;
+                /** @description Comma-separated fields for search (used with q) */
+                searchBy?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data?: components["schemas"]["UserDto"][];
+                        meta?: components["schemas"]["PageMetaDto"];
+                    };
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
             };
         };
     };
@@ -1199,7 +2132,25 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
             };
         };
     };
@@ -1218,7 +2169,33 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
             };
         };
     };
@@ -1241,7 +2218,41 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorDto"];
+                };
             };
         };
     };
@@ -1258,7 +2269,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AuthDTO"];
+                };
             };
         };
     };
@@ -1275,7 +2288,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string;
+                };
             };
         };
     };
@@ -1292,7 +2307,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
             };
         };
     };
@@ -1309,7 +2326,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string;
+                };
             };
         };
     };
@@ -1326,7 +2345,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"][];
+                };
             };
         };
     };
@@ -1347,7 +2368,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"];
+                };
             };
         };
     };
@@ -1366,7 +2389,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"];
+                };
             };
         };
     };
@@ -1385,7 +2410,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"];
+                };
             };
         };
     };
@@ -1408,7 +2435,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"];
+                };
             };
         };
     };
@@ -1427,7 +2456,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ContactDto"][];
+                };
             };
         };
     };
@@ -1444,7 +2475,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FeedbackDto"][];
+                };
             };
         };
     };
@@ -1465,7 +2498,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FeedbackDto"];
+                };
             };
         };
     };
@@ -1484,7 +2519,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FeedbackDto"];
+                };
             };
         };
     };
@@ -1503,7 +2540,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FeedbackDto"];
+                };
             };
         };
     };
@@ -1526,7 +2565,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FeedbackDto"];
+                };
             };
         };
     };
@@ -1543,7 +2584,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"][];
+                };
             };
         };
     };
@@ -1564,7 +2607,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"];
+                };
             };
         };
     };
@@ -1583,7 +2628,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"];
+                };
             };
         };
     };
@@ -1602,7 +2649,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"];
+                };
             };
         };
     };
@@ -1625,7 +2674,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"];
+                };
             };
         };
     };
@@ -1644,7 +2695,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AchievementDto"][];
+                };
             };
         };
     };
@@ -1663,7 +2716,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GroupResponse"][];
+                    "application/json": components["schemas"]["GroupDto"][];
                 };
             };
             /** @description Groups Not Found */
@@ -1694,7 +2747,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GroupResponse"];
+                    "application/json": components["schemas"]["GroupDto"];
                 };
             };
         };
@@ -1716,7 +2769,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GroupResponse"];
+                    "application/json": components["schemas"]["GroupDto"];
                 };
             };
             /** @description Group by ID Not Found */
@@ -1745,7 +2798,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GroupResponse"];
+                    "application/json": components["schemas"]["GroupDto"];
                 };
             };
         };
@@ -1771,7 +2824,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["GroupResponse"];
+                    "application/json": components["schemas"]["GroupDto"];
                 };
             };
         };
@@ -1829,7 +2882,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CourseDto"][];
+                };
             };
         };
     };
@@ -1850,7 +2905,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CourseDto"];
+                };
             };
         };
     };
@@ -1869,7 +2926,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CourseDto"];
+                };
             };
         };
     };
@@ -1888,7 +2947,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CourseDto"];
+                };
             };
         };
     };
@@ -1911,7 +2972,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CourseDto"];
+                };
             };
         };
     };
@@ -1928,7 +2991,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisciplineDto"][];
+                };
             };
         };
     };
@@ -1949,7 +3014,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisciplineDto"];
+                };
             };
         };
     };
@@ -1968,7 +3035,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisciplineDto"];
+                };
             };
         };
     };
@@ -1987,7 +3056,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisciplineDto"];
+                };
             };
         };
     };
@@ -2010,7 +3081,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisciplineDto"];
+                };
             };
         };
     };
@@ -2027,7 +3100,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ThemeDto"][];
+                };
             };
         };
     };
@@ -2048,7 +3123,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ThemeDto"];
+                };
             };
         };
     };
@@ -2067,7 +3144,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ThemeDto"];
+                };
             };
         };
     };
@@ -2086,7 +3165,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ThemeDto"];
+                };
             };
         };
     };
@@ -2109,7 +3190,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ThemeDto"];
+                };
             };
         };
     };
@@ -2126,7 +3209,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"][];
+                };
             };
         };
     };
@@ -2147,7 +3232,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"];
+                };
             };
         };
     };
@@ -2166,7 +3253,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"];
+                };
             };
         };
     };
@@ -2186,7 +3275,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"];
+                };
             };
         };
     };
@@ -2210,7 +3301,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"];
+                };
             };
         };
     };
@@ -2230,7 +3323,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserPriorityDto"];
+                };
             };
         };
     };
@@ -2247,7 +3342,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GradeDto"][];
+                };
             };
         };
     };
@@ -2268,7 +3365,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GradeDto"];
+                };
             };
         };
     };
@@ -2287,7 +3386,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GradeDto"];
+                };
             };
         };
     };
@@ -2306,7 +3407,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GradeDto"];
+                };
             };
         };
     };
@@ -2329,7 +3432,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GradeDto"];
+                };
             };
         };
     };
@@ -2346,7 +3451,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"][];
+                };
             };
         };
     };
@@ -2367,7 +3474,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2386,7 +3495,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2405,7 +3516,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2428,7 +3541,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2466,7 +3581,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2485,7 +3602,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2504,7 +3623,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2523,7 +3644,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingDto"];
+                };
             };
         };
     };
@@ -2542,7 +3665,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MeetingUsersDto"];
+                };
             };
         };
     };
@@ -2559,7 +3684,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HomeworkDto"][];
+                };
             };
         };
     };
@@ -2580,7 +3707,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HomeworkDto"];
+                };
             };
         };
     };
@@ -2599,7 +3728,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HomeworkDto"];
+                };
             };
         };
     };
@@ -2618,7 +3749,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HomeworkDto"];
+                };
             };
         };
     };
@@ -2637,6 +3770,314 @@ export interface operations {
             };
         };
         responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HomeworkDto"];
+                };
+            };
+        };
+    };
+    "HomeworkController-assignStudent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Student assigned to homework successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "HomeworkController-removeStudent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Student removed from homework successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "FileController-uploadFile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Файл для загрузки
+                     */
+                    file?: string;
+                    /**
+                     * @description Тип файла
+                     * @enum {string}
+                     */
+                    type?: "MEDIA" | "DOC";
+                    /** @description Описание файла */
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Файл успешно загружен */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadResponseDto"];
+                };
+            };
+        };
+    };
+    "FileController-uploadLogo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Логотип пользователя (изображение)
+                     */
+                    logo?: string;
+                    /** @description Описание логотипа */
+                    description?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Логотип успешно загружен */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadResponseDto"];
+                };
+            };
+        };
+    };
+    "FileController-updateLogo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                fileId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Логотип успешно обновлен */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileDto"];
+                };
+            };
+        };
+    };
+    "FileController-getCurrentUserLogo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Логотип найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileDto"];
+                };
+            };
+            /** @description Логотип не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "FileController-getUserLogo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                userId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Логотип найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileDto"];
+                };
+            };
+            /** @description Логотип не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "FileController-getFile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл найден */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileDto"];
+                };
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "FileController-deleteFile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл успешно удален */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "FileController-downloadFile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Файл успешно скачан */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Файл не найден */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "HealthController-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is healthy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Service is unhealthy */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "HealthController-ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is ready */
             200: {
                 headers: {
                     [name: string]: unknown;

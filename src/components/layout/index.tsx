@@ -3,6 +3,7 @@ import React from "react";
 import { Sidebar } from "../";
 import {LinearGround} from "../decors";
 import { DevPanel } from "../dev/dev-panel";
+import { DialogHost } from "../dialog/DialogHost";
 import {Splitter} from "antd";
 import {useSidebarStatus} from "../../store/sidebar-status.slice.ts";
 
