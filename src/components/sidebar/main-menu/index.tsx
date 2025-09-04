@@ -29,15 +29,13 @@ export const MainMenu: React.FC = () => {
 				<Link to={'/'} className="w-[40px] min-h-[40px] flex items-center justify-center pl-1 pb-8">
 					<CompanyLogo />
 				</Link>
-				{/*<div*/}
-				{/*	className="bg-[var(--primary-color)] text-white w-[40px] min-h-[40px] flex items-center justify-center text-[12px] rounded-sm">LOGO*/}
-				{/*</div>*/}
 				{!isMainMenuMinimalistic && (
 					<div className="font-bold text-[20px] leading-4 text-[var(--primary-color)]">
 						<div>STAT</div><div>DYNAMIC</div>
 					</div>
 				)}
 			</div>
+			
 			<div className={clsx(
 				"w-[40px] bg-[var(--second-light-color)] h-[1px] mr-[10px]",
 				isMainMenuMinimalistic ? "w-[40px]" : "w-[160px]",

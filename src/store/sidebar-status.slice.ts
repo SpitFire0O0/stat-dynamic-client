@@ -14,13 +14,15 @@ type sidebarStatusActions = {
 	setIsMainMenuMinimalistic: (isMainMenuMinimalistic: boolean) => void;
 }
 
-const sidebarStatusSlice: StateCreator<sidebarStatusState & sidebarStatusActions> = (set) => ({
-	size: 240,
+const sidebarStatusSlice: StateCreator<sidebarStatusState & sidebarStatusActions> = (set, get) => ({
 	isMinimalistic: false,
 	isMainMenuMinimalistic: true,
+	size: 240,
 	
 	setSize: (size: number) => {
-		if (size <= 60)
+		const {isMainMenuMinimalistic}: boolean = get();
+		
+		if ((isMainMenuMinimalistic && size <= 60) || (!isMainMenuMinimalistic && size <= 240))
 			set({ isMinimalistic: true });
 		
 		set({ size })

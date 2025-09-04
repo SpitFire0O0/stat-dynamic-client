@@ -3,15 +3,11 @@ import React from "react";
 import { Sidebar } from "../";
 import {LinearGround} from "../decors";
 import { DevPanel } from "../dev/dev-panel";
-import { DialogHost } from "../dialog/DialogHost";
 import {Splitter} from "antd";
 import {useSidebarStatus} from "../../store/sidebar-status.slice.ts";
 
 export const Layout: React.FC = () => {
-	const { setSize, size, isMinimalistic } = useSidebarStatus();
-	
-	// Временная отладка
-	console.log('Layout render:', { size, isMinimalistic });
+	const { setSize, size, isMinimalistic, isMainMenuMinimalistic } = useSidebarStatus();
 	
 	const sidebarChangeSize = (size: number): void => {
 		localStorage.setItem("sidebar-size", size.toString());
@@ -25,7 +21,11 @@ export const Layout: React.FC = () => {
 				layout="horizontal"
 				onResize={(sizes: number[]) => sidebarChangeSize(sizes[0])}
 			>
-				<Splitter.Panel defaultSize={localStorage.getItem("sidebar-size") ? parseInt(localStorage.getItem("sidebar-size")!) : 280} min={124} max={400}>
+				<Splitter.Panel
+					defaultSize={localStorage.getItem("sidebar-size") ? parseInt(localStorage.getItem("sidebar-size")!) : 280}
+					min={isMainMenuMinimalistic ? 124 : 244}
+					max={400}
+				>
 					<Sidebar />
 				</Splitter.Panel>
 				<Splitter.Panel
