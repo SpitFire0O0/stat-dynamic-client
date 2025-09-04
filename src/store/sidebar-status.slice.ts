@@ -16,11 +16,12 @@ type sidebarStatusActions = {
 
 const sidebarStatusSlice: StateCreator<sidebarStatusState & sidebarStatusActions> = (set, get) => ({
 	isMinimalistic: false,
-	isMainMenuMinimalistic: true,
-	size: 240,
+	isMainMenuMinimalistic: localStorage.getItem("isMainMenuMinimalistic")
+		? ( localStorage.getItem("sidebar-size") === "true" ) : true,
+	size: localStorage.getItem("sidebar-size") ? parseInt(localStorage.getItem("sidebar-size")!) : 280,
 	
 	setSize: (size: number) => {
-		const {isMainMenuMinimalistic}: boolean = get();
+		const { isMainMenuMinimalistic }: boolean = get();
 		
 		if ((isMainMenuMinimalistic && size <= 60) || (!isMainMenuMinimalistic && size <= 240))
 			set({ isMinimalistic: true });
@@ -28,18 +29,18 @@ const sidebarStatusSlice: StateCreator<sidebarStatusState & sidebarStatusActions
 		set({ size })
 	},
 	
-	setIsMinimalistic: (isMinimalistic: boolean) => set({
-		isMinimalistic
-	}),
+	setIsMinimalistic: (isMinimalistic: boolean) => set({ isMinimalistic }),
 	
-	setIsMainMenuMinimalistic: (isMainMenuMinimalistic: boolean) => set({
-		isMainMenuMinimalistic
-	}),
+	setIsMainMenuMinimalistic: (isMainMenuMinimalistic: boolean) => {
+		localStorage.setItem("isMainMenuMinimalistic", String(isMainMenuMinimalistic))
+		
+		set({ isMainMenuMinimalistic })
+	},
 	
 	resetSidebar: () => set({
 		isMainMenuMinimalistic: true,
 		isMinimalistic: false,
-		size: 240,
+		size: 280,
 	}),
 })
 

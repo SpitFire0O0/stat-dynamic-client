@@ -11,7 +11,7 @@ import {useSidebarStatus} from "../../../store/sidebar-status.slice.ts";
 
 export const ProfileBar: React.FC = () => {
 	const { setActiveMenuIndex } = useActiveMenuStore();
-	const { size } = useSidebarStatus();
+	const { size }: number = useSidebarStatus();
 
 	return (
 		<div className={module.Container}>

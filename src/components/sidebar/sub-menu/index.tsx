@@ -18,10 +18,8 @@ export const SubMenu: React.FC = () => {
 	
 	useLayoutEffect(() => {
 		const updateVisibility = () => {
-			if (parentRef.current) {
+			if (parentRef.current)
 				setIsMinimalistic(isMainMenuMinimalistic ? size <= 250 : size < 320)
-				console.log(parentRef.current?.offsetWidth)
-			}
 		}
 		
 		updateVisibility();
