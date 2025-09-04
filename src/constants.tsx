@@ -23,7 +23,7 @@ interface IBaseMenuItem {
 	sub: ISubMenuItem[];
 }
 
-interface ISubMenuItem {
+export interface ISubMenuItem {
 	id: number;
 	label: string;
 	icon: JSX.Element;

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import React from "react";
+import React, {useEffect} from "react";
 import { Sidebar } from "../";
 import {LinearGround} from "../decors";
 import { DevPanel } from "../dev/dev-panel";
@@ -7,12 +7,31 @@ import {Splitter} from "antd";
 import {useSidebarStatus} from "../../store/sidebar-status.slice.ts";
 
 export const Layout: React.FC = () => {
-	const { setSize, size, isMinimalistic, isMainMenuMinimalistic } = useSidebarStatus();
+	const { size, setSize, isMainMenuMinimalistic, setIsMainMenuMinimalistic } = useSidebarStatus();
 	
 	const sidebarChangeSize = (size: number): void => {
 		localStorage.setItem("sidebar-size", size.toString());
 		setSize(size);
 	}
+	
+	useEffect(() => {
+		const sidebarHotkeyEvent = (e) => {
+			switch (e.key) {
+				case "`": {
+					e.preventDefault();
+					sidebarChangeSize(size <= 120 ? 400 : 120);
+				}
+				
+				case "Tab": {
+					e.preventDefault();
+					setIsMainMenuMinimalistic(!isMainMenuMinimalistic);
+				}
+			}
+		}
+		window.addEventListener("keydown", sidebarHotkeyEvent);
+		
+		return () => window.removeEventListener("keydown", sidebarHotkeyEvent);
+	}, [size, isMainMenuMinimalistic])
 	
 	return (
 		<div className="flex h-full w-full">
@@ -25,6 +44,7 @@ export const Layout: React.FC = () => {
 					defaultSize={localStorage.getItem("sidebar-size") ? parseInt(localStorage.getItem("sidebar-size")!) : 280}
 					min={isMainMenuMinimalistic ? 124 : 244}
 					max={400}
+					size={size}
 				>
 					<Sidebar />
 				</Splitter.Panel>
